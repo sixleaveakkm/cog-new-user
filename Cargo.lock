@@ -360,6 +360,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap_complete"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60d123fbea4c5d9799cffd44051e2125c880efd23b3b7c529baf3ea5508c8736"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "clap_derive"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -373,13 +382,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "cog_new_user"
+name = "cog-new-user"
 version = "0.1.0"
 dependencies = [
  "aws-config",
  "aws-sdk-cognitoidentityprovider",
  "aws-sdk-config",
  "clap",
+ "clap_complete",
  "tokio",
 ]
 
