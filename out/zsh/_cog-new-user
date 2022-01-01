@@ -1,0 +1,73 @@
+#compdef cog-new-user
+
+autoload -U is-at-least
+
+_cog-new-user() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'--client-id=[cognito client id]:CLIENT_ID: ' \
+'--user-pool-id=[cognito user pool id]:USER_POOL_ID: ' \
+'--username=[username to create]:USERNAME: ' \
+'--email=[optional email for user]:EMAIL: ' \
+'--password=[user'\''s password]:PASSWORD: ' \
+'--region=[aws region or use profile default]:REGION: ' \
+'--profile=[aws profile or load from env]:PROFILE: ' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+":: :_cog-new-user_commands" \
+"*::: :->cog-new-user" \
+&& ret=0
+    case $state in
+    (cog-new-user)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:cog-new-user-command-$line[1]:"
+        case $line[1] in
+            (generate)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+':target:' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_cog-new-user_commands] )) ||
+_cog-new-user_commands() {
+    local commands; commands=(
+'generate:generate auto complete file e.g. --generate=bash' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'cog-new-user commands' commands "$@"
+}
+(( $+functions[_cog-new-user__generate_commands] )) ||
+_cog-new-user__generate_commands() {
+    local commands; commands=()
+    _describe -t commands 'cog-new-user generate commands' commands "$@"
+}
+(( $+functions[_cog-new-user__help_commands] )) ||
+_cog-new-user__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'cog-new-user help commands' commands "$@"
+}
+
+_cog-new-user "$@"
