@@ -1,25 +1,22 @@
-use std::str::FromStr;
 use aws_config::meta::region::RegionProviderChain;
-use clap::{IntoApp, Subcommand, App};
-use aws_sdk_config::{Region};
-use aws_sdk_cognitoidentityprovider::{Client, Error};
 use aws_sdk_cognitoidentityprovider::model::AttributeType;
-use clap_complete::{Shell, generate};
+use aws_sdk_cognitoidentityprovider::{Client, Error};
+use aws_sdk_config::Region;
+use clap::Parser;
+use clap::{App, IntoApp, Subcommand};
+use clap_complete::{generate, Shell};
 use std::io;
 use std::process::exit;
-use clap::Parser;
+use std::str::FromStr;
 
 #[derive(Subcommand)]
 enum Commands {
     /// generate auto complete file e.g. --generate=bash
-    Generate {
-        target: String,
-    }
+    Generate { target: String },
 }
 #[derive(Parser)]
 #[clap(about, version, author, name = "cog-new-user")]
 pub struct Args {
-
     #[clap(subcommand)]
     command: Option<Commands>,
 
@@ -52,7 +49,6 @@ pub struct Args {
     pub profile: Option<String>,
 }
 
-
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args: Args = Args::parse();
@@ -71,8 +67,8 @@ async fn main() -> Result<(), Error> {
     if let Some(pro) = args.profile {
         std::env::set_var("AWS_PROFILE", pro)
     }
-    let region_provider = RegionProviderChain::first_try(args.region.map(Region::new))
-            .or_default_provider();
+    let region_provider =
+        RegionProviderChain::first_try(args.region.map(Region::new)).or_default_provider();
     let shared_config = aws_config::from_env().region(region_provider).load().await;
     let client = Client::new(&shared_config);
 
@@ -93,11 +89,11 @@ async fn main() -> Result<(), Error> {
         exit(1)
     });
 
-
-    let mut sign_up_pre = client.sign_up().
-            client_id(&client_id).
-            username(&username).
-            password(&password);
+    let mut sign_up_pre = client
+        .sign_up()
+        .client_id(&client_id)
+        .username(&username)
+        .password(&password);
     if let Some(email) = args.email {
         let email_at = AttributeType::builder().name("email").value(email).build();
         sign_up_pre = sign_up_pre.user_attributes(email_at);
@@ -105,7 +101,12 @@ async fn main() -> Result<(), Error> {
 
     sign_up_pre.send().await?;
 
-    client.admin_confirm_sign_up().user_pool_id(&user_pool_id).username(&username).send().await?;
+    client
+        .admin_confirm_sign_up()
+        .user_pool_id(&user_pool_id)
+        .username(&username)
+        .send()
+        .await?;
 
     Ok(())
 }
