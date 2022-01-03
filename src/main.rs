@@ -11,7 +11,7 @@ use std::str::FromStr;
 
 #[derive(Subcommand)]
 enum Commands {
-    /// generate auto complete file e.g. --generate=bash
+    /// generate auto complete file e.g. cog-new-user generate bash
     Generate { target: String },
 }
 #[derive(Parser)]
